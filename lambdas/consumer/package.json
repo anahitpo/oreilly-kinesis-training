@@ -1,0 +1,13 @@
+{
+  "name": "consumer",
+  "version": "1.0.0",
+  "description": "Lambda function to read reacords from a Kinesis Stream",
+  "main": "consumer.js",
+  "scripts": {
+  },
+  "author": "Anahit",
+  "license": "ISC",
+  "devDependencies": {
+    "aws-sdk": "^2.964.0"
+  }
+}

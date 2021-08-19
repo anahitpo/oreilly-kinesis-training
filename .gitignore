@@ -1,0 +1,11 @@
+node_modules
+package-lock.json
+
+# npm build generated files
+*.d.ts
+lib/*.js
+bin/*.js
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
