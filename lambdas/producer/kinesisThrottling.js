@@ -46,7 +46,7 @@ exports.sendTooManyRecords = async (partitionKeys, batchCount) => {
   const recordBatches = tooManyRecords(partitionKeys, batchCount)
 
   try {
-    await Promise.all(recordBatches.map(async (records) => putKinesisRecords(records)))
+    await Promise.all(recordBatches.map(putKinesisRecords))
   } catch (err) {
     console.error('ERROR: Smth bad happened!', err)
   }

@@ -17,6 +17,7 @@ const kinesisURL = `https://kinesis.${process.env.AWS_REGION}.amazonaws.com:443`
  * Retries and failures of the entire request
  */
 describe('SDK Retries', () => {
+
   const kinesisSuccessAfterFailures = () => nock(kinesisURL)
     .post('/')
     .times(MAX_RETRIES)

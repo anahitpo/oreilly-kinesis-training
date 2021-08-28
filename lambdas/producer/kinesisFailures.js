@@ -10,7 +10,7 @@ const AWS = require('aws-sdk')
 const zipWith = require('lodash.zipwith')
 
 const { STREAM_NAME, MAX_RETRIES } = process.env
-const RETRY_DELAY_BASE = 500
+const RETRY_DELAY_BASE = 1000
 
 const kinesis = new AWS.Kinesis({
   apiVersion: '2013-12-02',
@@ -120,10 +120,10 @@ const bestRetryForFailedRecords = async (records, response, attempt = 1) => {
     if (attempt <= MAX_RETRIES) {
       console.log(`Retrying ${recordsToRetry.length} failed records..attempt:`, attempt)
 
-      // Step 3.3 / 3.5
-      // await backoff(exponentialDelay(attempt))
-      // Step 3.4 / 3.6
-      await backoff(delayWithJitter(attempt))
+      // Step 3.3
+      await backoff(exponentialDelay(attempt))
+      // Step 3.4 - 3.5.
+      // await backoff(delayWithJitter(attempt))
 
       const newResponse = await putKinesisRecords(recordsToRetry)
       await bestRetryForFailedRecords(recordsToRetry, newResponse, attempt + 1)
@@ -143,11 +143,11 @@ exports.sendRecordsInABatch = async (partitionKeys) => {
     console.log('RESPONSE:', response)
 
     // - Step 3.1
-    // await simpleRetryForFailedRecords(records, response)
+    await simpleRetryForFailedRecords(records, response)
     // - Step 3.2
     // await betterRetryForFailedRecords(records, response)
     // - Step 3.3 - 3.4
-    await bestRetryForFailedRecords(records, response)
+    // await bestRetryForFailedRecords(records, response)
   } catch (err) {
     console.error('ERROR: Smth bad happened!')
   }

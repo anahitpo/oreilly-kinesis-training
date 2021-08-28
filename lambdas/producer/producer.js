@@ -35,8 +35,8 @@ exports.handler = async (event) => {
   // await sendTooManyRecordsWithLogging(partitionKeys, batchCount)
 
   /* Step 3: Handle the Failures */
-  // - Step 3.0:
+  // - Step 3.1 - 3.4:
   // await sendRecordsInABatch(partitionKeys)
-  // - Step 3.5 - 3.6:
+  // - Step 3.5:
   // await sendTooManyRecordsWithRetries(partitionKeys, batchCount)
 }
