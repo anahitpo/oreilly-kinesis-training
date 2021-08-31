@@ -19,7 +19,6 @@ const putKinesisRecord = (data, partitionKey) => {
     Data: JSON.stringify(data),
     PartitionKey: partitionKey
   }
-
   return kinesis.putRecord(record).promise()
 }
 

@@ -75,10 +75,10 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
       startingPosition: lambda.StartingPosition.LATEST,
       batchSize: 10000,
       retryAttempts: 1,
-      // maxRecordAge: cdk.Duration.minutes(1),
-      // bisectBatchOnError: true,
-      // reportBatchItemFailures: true,
-      // onFailure: new SqsDlq(dlq)
+      maxRecordAge: cdk.Duration.minutes(1),
+      //bisectBatchOnError: true,
+      //reportBatchItemFailures: true,
+      //onFailure: new SqsDlq(dlq)
     }))
     */
 
@@ -96,21 +96,29 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
     /**
      * EFO
      */
+    /** Step 1.0 */
     /*
     const enhancedConsumer = new CfnStreamConsumer(this, 'EnhancedConsumer', {
       consumerName: 'oreilly-stream-consumer',
       streamArn: stream.streamArn
     })
+    */
 
+    /** Step 1.1: IAM policy */
+    /*
     const enhancedConsumerPolicy = new PolicyStatement({
       resources: [enhancedConsumer.attrConsumerArn],
       actions: ['kinesis:SubscribeToShard'],
     })
 
     consumer.addToRolePolicy(enhancedConsumerPolicy)
-    const esm = new EventSourceMapping(this, 'EventSourceMapping', {
+    */
+
+    /** Step 1.2: ESM */
+    /*
+    new EventSourceMapping(this, 'EventSourceMapping', {
       batchSize: 10000,
-      startingPosition: lambda.StartingPosition.TRIM_HORIZON,
+      startingPosition: lambda.StartingPosition.LATEST,
       eventSourceArn: enhancedConsumer.attrConsumerArn,
       target: consumer,
     })

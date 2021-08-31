@@ -26,6 +26,7 @@ const putKinesisRecords = (records) => {
     Records: records
   }
   console.log('RECORD COUNT:', records.length)
+  //console.log('RECORD:', JSON.stringify(payload))
   return kinesis.putRecords(payload).promise()
 }
 
