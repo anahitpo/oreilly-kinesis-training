@@ -21,6 +21,7 @@ const putKinesisRecords = (records) => {
     StreamName: STREAM_NAME,
     Records: records
   }
+  //console.log('REQUEST:', payload)
   return kinesis.putRecords(payload).promise()
 }
 

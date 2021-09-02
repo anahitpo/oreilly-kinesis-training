@@ -147,7 +147,7 @@ exports.sendRecordsInABatch = async (partitionKeys) => {
     await simpleRetryForFailedRecords(records, response)
     // - Step 3.2
     // await betterRetryForFailedRecords(records, response)
-    // - Step 3.3 - 3.4
+    // - Step 3.3 - 3.5
     // await bestRetryForFailedRecords(records, response)
   } catch (err) {
     console.error('ERROR: Smth bad happened!')

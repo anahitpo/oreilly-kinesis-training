@@ -33,7 +33,7 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
       }
     })
 
-    stream.grantWrite(producer);
+    stream.grantWrite(producer)
 
     // Consumer Lambda
     const consumer = new lambda.Function(this, 'KinesisConsumer', {
@@ -45,11 +45,7 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
       }
     })
 
-    stream.grantRead(consumer);
-
-    const dlq = new Queue(this, 'DLQ', {
-      queueName: 'consumer-lambda-dlq'
-    })
+    stream.grantRead(consumer)
 
     /* Basic ESM */
 
@@ -70,6 +66,9 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
 
 
     /** Failures */
+    const dlq = new Queue(this, 'DLQ', {
+      queueName: 'consumer-lambda-dlq'
+    })
     /*
     consumer.addEventSource(new KinesisEventSource(stream, {
       startingPosition: lambda.StartingPosition.LATEST,
