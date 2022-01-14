@@ -8,6 +8,6 @@
   "author": "Anahit",
   "license": "ISC",
   "devDependencies": {
-    "aws-sdk": "^2.964.0"
+    "aws-sdk": "^2.1057.0"
   }
 }

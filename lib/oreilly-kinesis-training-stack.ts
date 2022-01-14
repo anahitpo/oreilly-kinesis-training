@@ -2,11 +2,11 @@ import * as cdk from '@aws-cdk/core'
 import * as kinesis from '@aws-cdk/aws-kinesis'
 import * as lambda from '@aws-cdk/aws-lambda'
 import { PolicyStatement } from '@aws-cdk/aws-iam'
-import { StreamEncryption, CfnStreamConsumer } from '@aws-cdk/aws-kinesis'
+import { StreamEncryption, CfnStreamConsumer, StreamMode } from '@aws-cdk/aws-kinesis'
 import { KinesisEventSource, SqsDlq } from '@aws-cdk/aws-lambda-event-sources'
 import { EventSourceMapping } from '@aws-cdk/aws-lambda'
 import { Queue } from '@aws-cdk/aws-sqs'
-import { Dashboard, GraphWidget, IWidget, Metric } from '@aws-cdk/aws-cloudwatch'
+import { Dashboard, GraphWidget, IWidget, Metric, DimensionsMap } from '@aws-cdk/aws-cloudwatch'
 
 export class OreillyKinesisTrainingStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -16,6 +16,7 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
     const stream = new kinesis.Stream(this, 'OReillyStream', {
       streamName: 'oreilly-stream',
       shardCount: 1,
+      streamMode: StreamMode.PROVISIONED,
       encryption: StreamEncryption.UNENCRYPTED
     })
 
@@ -133,17 +134,17 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
     const kinesisMetric = (metricName: string, label: string, color: string, statistic: string = 'Sum') => new Metric({
       metricName,
       namespace: 'AWS/Kinesis',
-      dimensions: {'StreamName': stream.streamName},
+      dimensionsMap: {'StreamName': stream.streamName},
       statistic,
       label,
       period: cdk.Duration.minutes(1),
       color
     })
 
-    const lambdaMetric = (metricName: string, label: string, color: string, dimensions: object = {}) => new Metric({
+    const lambdaMetric = (metricName: string, label: string, color: string, dimensionsMap: DimensionsMap = {}) => new Metric({
       metricName,
       namespace: 'AWS/Lambda',
-      dimensions,
+      dimensionsMap,
       statistic: 'Maximum',
       label,
       period: cdk.Duration.minutes(1),

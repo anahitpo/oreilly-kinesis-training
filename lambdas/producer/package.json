@@ -12,9 +12,9 @@
     "lodash.zipwith": "^4.2.0"
   },
   "devDependencies": {
-    "aws-sdk": "^2.964.0",
-    "dotenv": "^10.0.0",
-    "nock": "^13.1.1",
-    "mocha": "^9.0.2"
+    "aws-sdk": "^2.1057.0",
+    "dotenv": "^11.0.0",
+    "nock": "^13.2.2",
+    "mocha": "^9.1.3"
   }
 }

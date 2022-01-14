@@ -5,7 +5,7 @@ import * as OreillyKinesisTraining from '../lib/oreilly-kinesis-training-stack';
 test('Empty Stack', () => {
     const app = new cdk.App();
     // WHEN
-    const stack = new OreillyKinesisTraining.OreillyKinesisTrainingStack(app, 'MyTestStack');
+    const stack = new OreillyKinesisTraining.OreillyKinesisTrainingStack(app, 'OreillyKinesisTrainingStack');
     // THEN
     expectCDK(stack).to(matchTemplate({
       "Resources": {}

@@ -5,6 +5,7 @@ package-lock.json
 *.d.ts
 lib/*.js
 bin/*.js
+test/*.js
 
 # CDK asset staging directory
 .cdk.staging
