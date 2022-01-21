@@ -1,23 +1,23 @@
-import * as cdk from '@aws-cdk/core'
-import * as kinesis from '@aws-cdk/aws-kinesis'
-import * as lambda from '@aws-cdk/aws-lambda'
-import { PolicyStatement } from '@aws-cdk/aws-iam'
-import { StreamEncryption, CfnStreamConsumer, StreamMode } from '@aws-cdk/aws-kinesis'
-import { KinesisEventSource, SqsDlq } from '@aws-cdk/aws-lambda-event-sources'
-import { EventSourceMapping } from '@aws-cdk/aws-lambda'
-import { Queue } from '@aws-cdk/aws-sqs'
-import { Dashboard, GraphWidget, IWidget, Metric, DimensionsMap } from '@aws-cdk/aws-cloudwatch'
+import { Construct } from 'constructs'
+import { Stack, StackProps, Duration } from 'aws-cdk-lib'
+import {
+  aws_kinesis as kinesis,
+  aws_lambda as lambda,
+  aws_iam as iam,
+  aws_lambda_event_sources as eventSources,
+  aws_sqs as sqs,
+  aws_cloudwatch as cloudwatch } from 'aws-cdk-lib'
 
-export class OreillyKinesisTrainingStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class OreillyKinesisTrainingStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props)
 
     // The stream
     const stream = new kinesis.Stream(this, 'OReillyStream', {
       streamName: 'oreilly-stream',
       shardCount: 1,
-      streamMode: StreamMode.PROVISIONED,
-      encryption: StreamEncryption.UNENCRYPTED
+      streamMode: kinesis.StreamMode.PROVISIONED,
+      encryption: kinesis.StreamEncryption.UNENCRYPTED
     })
 
     // Producer Lambda
@@ -26,7 +26,7 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_14_X,
       code: lambda.Code.fromAsset('lambdas/producer', { exclude: ['test', '*.json'] }),
       handler: 'producer.handler',
-      timeout: cdk.Duration.seconds(300), // 5 min
+      timeout: Duration.seconds(300), // 5 min
       memorySize: 1024,
       environment: {
         STREAM_NAME: stream.streamName,
@@ -50,7 +50,7 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
 
     /* Basic ESM */
 
-    consumer.addEventSource(new KinesisEventSource(stream, {
+    consumer.addEventSource(new eventSources.KinesisEventSource(stream, {
       startingPosition: lambda.StartingPosition.LATEST,
       batchSize: 10000
     }))
@@ -58,7 +58,7 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
 
     /* Parallelization factor */
     /*
-    consumer.addEventSource(new KinesisEventSource(stream, {
+    consumer.addEventSource(new eventSources.KinesisEventSource(stream, {
       startingPosition: lambda.StartingPosition.LATEST,
       batchSize: 10000,
       parallelizationFactor: 3
@@ -67,28 +67,28 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
 
 
     /** Failures */
-    const dlq = new Queue(this, 'DLQ', {
+    const dlq = new sqs.Queue(this, 'DLQ', {
       queueName: 'consumer-lambda-dlq'
     })
     /*
-    consumer.addEventSource(new KinesisEventSource(stream, {
+    consumer.addEventSource(new eventSources.KinesisEventSource(stream, {
       startingPosition: lambda.StartingPosition.LATEST,
       batchSize: 10000,
       retryAttempts: 1,
-      maxRecordAge: cdk.Duration.minutes(1),
+      maxRecordAge: Duration.minutes(1),
       //bisectBatchOnError: true,
       //reportBatchItemFailures: true,
-      //onFailure: new SqsDlq(dlq)
+      //onFailure: new eventSources.SqsDlq(dlq)
     }))
     */
 
 
     /** Tumbling window */
     /*
-    consumer.addEventSource(new KinesisEventSource(stream, {
+    consumer.addEventSource(new eventSources.KinesisEventSource(stream, {
       startingPosition: lambda.StartingPosition.LATEST,
       batchSize: 3,
-      tumblingWindow: cdk.Duration.seconds(10)
+      tumblingWindow: Duration.seconds(10)
     }))
     */
 
@@ -98,7 +98,7 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
      */
     /** Step 1.0 */
     /*
-    const enhancedConsumer = new CfnStreamConsumer(this, 'EnhancedConsumer', {
+    const enhancedConsumer = new kinesis.CfnStreamConsumer(this, 'EnhancedConsumer', {
       consumerName: 'oreilly-stream-consumer',
       streamArn: stream.streamArn
     })
@@ -106,7 +106,7 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
 
     /** Step 1.1: IAM policy */
     /*
-    const enhancedConsumerPolicy = new PolicyStatement({
+    const enhancedConsumerPolicy = new iam.PolicyStatement({
       resources: [enhancedConsumer.attrConsumerArn],
       actions: ['kinesis:SubscribeToShard'],
     })
@@ -116,7 +116,7 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
 
     /** Step 1.2: ESM */
     /*
-    new EventSourceMapping(this, 'EventSourceMapping', {
+    new lambda.EventSourceMapping(this, 'EventSourceMapping', {
       batchSize: 10000,
       startingPosition: lambda.StartingPosition.LATEST,
       eventSourceArn: enhancedConsumer.attrConsumerArn,
@@ -127,31 +127,31 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
 
 
     // CloudWatch Dashboard
-    const dashboard = new Dashboard(this, 'OReillyDashboard', {
+    const dashboard = new cloudwatch.Dashboard(this, 'OReillyDashboard', {
       dashboardName: 'OReilly'
     })
 
-    const kinesisMetric = (metricName: string, label: string, color: string, statistic: string = 'Sum') => new Metric({
+    const kinesisMetric = (metricName: string, label: string, color: string, statistic: string = 'Sum') => new cloudwatch.Metric({
       metricName,
       namespace: 'AWS/Kinesis',
       dimensionsMap: {'StreamName': stream.streamName},
       statistic,
       label,
-      period: cdk.Duration.minutes(1),
+      period: Duration.minutes(1),
       color
     })
 
-    const lambdaMetric = (metricName: string, label: string, color: string, dimensionsMap: DimensionsMap = {}) => new Metric({
+    const lambdaMetric = (metricName: string, label: string, color: string, dimensionsMap: cloudwatch.DimensionsMap = {}) => new cloudwatch.Metric({
       metricName,
       namespace: 'AWS/Lambda',
       dimensionsMap,
       statistic: 'Maximum',
       label,
-      period: cdk.Duration.minutes(1),
+      period: Duration.minutes(1),
       color
     })
 
-    const writingMetrics = new GraphWidget({
+    const writingMetrics = new cloudwatch.GraphWidget({
       width: 24,
       height: 8,
       title: 'Writing to a Stream',
@@ -189,7 +189,7 @@ export class OreillyKinesisTrainingStack extends cdk.Stack {
       ]
     })
 
-    const readingMetrics = new GraphWidget({
+    const readingMetrics = new cloudwatch.GraphWidget({
       width: 24,
       height: 8,
       title: 'Reading from a stream',
