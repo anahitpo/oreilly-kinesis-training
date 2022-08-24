@@ -23,7 +23,7 @@ export class OreillyKinesisTrainingStack extends Stack {
     // Producer Lambda
     const producer = new lambda.Function(this, 'KinesisProducer', {
       functionName: 'kinesisProducer',
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_16_X,
       code: lambda.Code.fromAsset('lambdas/producer', { exclude: ['test', '*.json'] }),
       handler: 'producer.handler',
       timeout: Duration.seconds(300), // 5 min
@@ -39,7 +39,7 @@ export class OreillyKinesisTrainingStack extends Stack {
     // Consumer Lambda
     const consumer = new lambda.Function(this, 'KinesisConsumer', {
       functionName: 'kinesisConsumer',
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_16_X,
       code: lambda.Code.fromAsset('lambdas/consumer', { exclude: ['test', '*.json'] }),
       handler: 'consumer.handler',
       environment: {

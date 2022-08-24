@@ -1,6 +1,6 @@
 {
   "name": "producer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Lambda function to write records to a Kinesis Stream",
   "main": "producer.js",
   "scripts": {
@@ -12,9 +12,9 @@
     "lodash.zipwith": "^4.2.0"
   },
   "devDependencies": {
-    "aws-sdk": "^2.1057.0",
-    "dotenv": "^11.0.0",
-    "nock": "^13.2.2",
-    "mocha": "^9.1.3"
+    "aws-sdk": "^2.1201.0",
+    "dotenv": "^16.0.1",
+    "nock": "^13.2.9",
+    "mocha": "^10.0.0"
   }
 }

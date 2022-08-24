@@ -5,7 +5,7 @@ Hello and welcome! Here you can find all the code from O'Reilly's **['Mastering 
 The AWS infrastructure is created and managed by [AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html). The application code is in TypeScript.
 
 ## Prerequisites
-* Node.js 14.x
+* Node.js 16.x
 * npm
 * TypeScript 2.7 or later (`npm -g install typescript`)
 * AWS CLI
