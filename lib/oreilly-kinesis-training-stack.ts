@@ -49,12 +49,12 @@ export class OreillyKinesisTrainingStack extends Stack {
     stream.grantRead(consumer)
 
     /* Basic ESM */
-
+  
     consumer.addEventSource(new eventSources.KinesisEventSource(stream, {
       startingPosition: lambda.StartingPosition.LATEST,
       batchSize: 10000
     }))
-
+  
 
     /* Parallelization factor */
     /*
@@ -76,11 +76,11 @@ export class OreillyKinesisTrainingStack extends Stack {
       batchSize: 10000,
       retryAttempts: 1,
       maxRecordAge: Duration.minutes(1),
-      //bisectBatchOnError: true,
-      //reportBatchItemFailures: true,
-      //onFailure: new eventSources.SqsDlq(dlq)
+      bisectBatchOnError: true,
+      reportBatchItemFailures: true,
+      onFailure: new eventSources.SqsDlq(dlq)
     }))
-    */
+*/    
 
 
     /** Tumbling window */
